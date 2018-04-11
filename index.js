@@ -5,7 +5,6 @@ require('dotenv').config();
 
 // Create a server with a host and port
 const server = hapi.server({
-    host: 'localhost',
     port: 5337
 });
 
