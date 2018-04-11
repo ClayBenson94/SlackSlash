@@ -14,6 +14,7 @@ server.route({
     path: '/slackslash',
     handler: function (request, h) {
 
+        console.log(request.payload);
         return h.response('yeet').type('text/html').code(200);
     }
 });
