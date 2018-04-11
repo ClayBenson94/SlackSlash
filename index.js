@@ -14,21 +14,21 @@ server.route({
     method: 'POST',
     path: '/slackslash',
     handler: async (request, h) => {
-		console.log(request.payload);
+        console.log(request.payload);
         if (request.payload && request.payload.token === process.env.SLACK_TOKEN) {
             const response_url = request.payload.response_url;
-			await axios({
-				method: 'post',
-				url: response_url,
-				data: {
-					response_type: "in_channel",
-					text: `<@${request.payload.user_id}> says ${request.payload.text.length > 0 ? request.payload.text : 'nothing'}!`
-				}
-			});
-			return h.response().code(200);
+            await axios({
+                method: 'post',
+                url: response_url,
+                data: {
+                    response_type: "in_channel",
+                    text: `<@${request.payload.user_id}> says ${request.payload.text.length > 0 ? request.payload.text : 'nothing'}!`
+                }
+            });
+            return h.response().code(200);
         } else {
-			return h.code(401);
-		}
+            return h.code(401);
+        }
     }
 });
 
