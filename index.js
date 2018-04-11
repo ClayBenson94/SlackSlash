@@ -13,9 +13,9 @@ server.route({
     method: 'POST',
     path: '/slackslash',
     handler: function (request, h) {
-
-        console.log(request.payload);
-        return h.response('yeet').type('text/html').code(200);
+        if (request.payload && request.payload.token === process.env.SLACK_TOKEN) {
+            return h.response('yeet').type('text/html').code(200);
+        }
     }
 });
 
