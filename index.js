@@ -1,6 +1,7 @@
 'use strict';
 
 const hapi = require('hapi');
+const axios = require('axios');
 require('dotenv').config();
 
 // Create a server with a host and port
@@ -12,10 +13,22 @@ const server = hapi.server({
 server.route({
     method: 'POST',
     path: '/slackslash',
-    handler: function (request, h) {
+    handler: async (request, h) => {
+		console.log(request.payload);
         if (request.payload && request.payload.token === process.env.SLACK_TOKEN) {
-            return h.response('yeet').type('text/html').code(200);
-        }
+            const response_url = request.payload.response_url;
+			await axios({
+				method: 'post',
+				url: response_url,
+				data: {
+					response_type: "in_channel",
+					text: `<@${request.payload.user_id}> says ${request.payload.text.length > 0 ? request.payload.text : 'nothing'}!`
+				}
+			});
+			return h.response().code(200);
+        } else {
+			return h.code(401);
+		}
     }
 });
 
