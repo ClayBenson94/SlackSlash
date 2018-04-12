@@ -2,18 +2,22 @@
 
 const axios = require('axios');
 
-function getCommandNameFromText (text) {
-    const commandName = text.split(' ')[0];
+function getCommandInfo (text) {
+    const splitText = text.split(' ');
+    const commandName = splitText[0];
     if (commandName) {
-        return commandName;
+        return {
+            commandName: commandName,
+            commandText: splitText.slice(1).join(' ')
+        };
     }
     return undefined;
 }
 
-async function scrabble (request, h) {
+async function scrabble (request, h, commandText) {
     const payload = request.payload;
     const url = payload.response_url;
-    const text = payload.text;
+    const text = commandText;
 
     const goodChars = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
     const input = text;
@@ -44,15 +48,13 @@ async function scrabble (request, h) {
 async function handleCommand (request, h) {
     const payload = request.payload;
 
-    console.log(getCommandNameFromText(payload.text));
-
-    const commandName = getCommandNameFromText(payload.text);
-    switch (commandName) {
+    const commandInfo = getCommandInfo(payload.text);
+    switch (commandInfo.commandName) {
     case 'help':
         // do nothing
         break;
     case 'scrabble':
-        return scrabble(request, h);
+        return scrabble(request, h, commandInfo.commandText);
     default:
         // do nothing
         break;
