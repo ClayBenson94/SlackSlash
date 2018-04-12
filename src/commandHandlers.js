@@ -17,13 +17,10 @@ function getCommandInfo (text) {
 async function scrabble (request, h, commandText) {
     const payload = request.payload;
     const url = payload.response_url;
-    const text = commandText;
-
     const goodChars = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-    const input = text;
     let output = '';
-    for (let i = 0; i < input.length; i++) {
-        const lowerChar = input[i].toLowerCase();
+    for (let i = 0; i < commandText.length; i++) {
+        const lowerChar = commandText[i].toLowerCase();
         if (goodChars.includes(lowerChar)) {
             output += lowerChar === ' ' ? ':--:' : `:-${lowerChar}:`;
         }
@@ -39,7 +36,62 @@ async function scrabble (request, h, commandText) {
             }
         });
     } catch (e) {
-        // console.error('Error in clayBot handler', e);
+        return h.response().code(500);
+    }
+    return h.response().code(200);
+}
+
+async function help (request, h) {
+    const payload = request.payload;
+    const url = payload.response_url;
+    const goodChars = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
+    let output = '';
+    for (let i = 0; i < commandText.length; i++) {
+        const lowerChar = commandText[i].toLowerCase();
+        if (goodChars.includes(lowerChar)) {
+            output += lowerChar === ' ' ? ':--:' : `:-${lowerChar}:`;
+        }
+    }
+
+    try {
+        await axios({
+            method: 'post',
+            url: url,
+            data: {
+                response_type: 'in_channel',
+                attachments: [
+                    {
+                        fallback: 'Required plain-text summary of the attachment.',
+                        color: '#36a64f',
+                        pretext: 'The following commands are available',
+                        author_name: '',
+                        author_link: '',
+                        author_icon: '',
+                        title: '',
+                        title_link: '',
+                        text: '',
+                        fields: [
+                            {
+                                title: 'help',
+                                value: 'Print this message',
+                                short: false
+                            },
+                            {
+                                title: 'scrabble [text]',
+                                value: 'Turns [text] into scrabble letters',
+                                short: false
+                            }
+                        ],
+                        image_url: 'http://my-website.com/path/to/image.jpg',
+                        thumb_url: 'http://example.com/path/to/thumb.png',
+                        footer: 'ClayBot',
+                        footer_icon: '',
+                        ts: null
+                    }
+                ]
+            }
+        });
+    } catch (e) {
         return h.response().code(500);
     }
     return h.response().code(200);
