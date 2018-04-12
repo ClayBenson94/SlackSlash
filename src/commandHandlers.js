@@ -11,7 +11,11 @@ function getCommandInfo (text) {
             commandText: splitText.slice(1).join(' ')
         };
     }
-    return undefined;
+	// Default to 'help'
+    return {
+		commandName: 'help',
+		commandText: ''
+	};
 }
 
 async function scrabble (request, h, commandText) {
@@ -44,32 +48,18 @@ async function scrabble (request, h, commandText) {
 async function help (request, h) {
     const payload = request.payload;
     const url = payload.response_url;
-    const goodChars = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
-    let output = '';
-    for (let i = 0; i < commandText.length; i++) {
-        const lowerChar = commandText[i].toLowerCase();
-        if (goodChars.includes(lowerChar)) {
-            output += lowerChar === ' ' ? ':--:' : `:-${lowerChar}:`;
-        }
-    }
 
     try {
         await axios({
             method: 'post',
             url: url,
             data: {
-                response_type: 'in_channel',
+                response_type: 'ephemeral',
                 attachments: [
                     {
-                        fallback: 'Required plain-text summary of the attachment.',
+                        fallback: 'Usage message for ClayBot',
                         color: '#36a64f',
                         pretext: 'The following commands are available',
-                        author_name: '',
-                        author_link: '',
-                        author_icon: '',
-                        title: '',
-                        title_link: '',
-                        text: '',
                         fields: [
                             {
                                 title: 'help',
@@ -82,11 +72,7 @@ async function help (request, h) {
                                 short: false
                             }
                         ],
-                        image_url: 'http://my-website.com/path/to/image.jpg',
-                        thumb_url: 'http://example.com/path/to/thumb.png',
-                        footer: 'ClayBot',
-                        footer_icon: '',
-                        ts: null
+                        footer: 'ClayBot'
                     }
                 ]
             }
@@ -103,13 +89,11 @@ async function handleCommand (request, h) {
     const commandInfo = getCommandInfo(payload.text);
     switch (commandInfo.commandName) {
     case 'help':
-        // do nothing
-        break;
+        return help(request, h);
     case 'scrabble':
         return scrabble(request, h, commandInfo.commandText);
     default:
-        // do nothing
-        break;
+        return help(request, h);
     }
 }
 
