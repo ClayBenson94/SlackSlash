@@ -11,11 +11,11 @@ function getCommandInfo (text) {
             commandText: splitText.slice(1).join(' ')
         };
     }
-	// Default to 'help'
+    // Default to 'help'
     return {
-		commandName: 'help',
-		commandText: ''
-	};
+        commandName: 'help',
+        commandText: ''
+    };
 }
 
 async function scrabble (request, h, commandText) {
