@@ -45,6 +45,27 @@ async function scrabble (request, h, commandText) {
     return h.response().code(200);
 }
 
+async function roshambo (request, h, commandText) {
+    const payload = request.payload;
+    const url = payload.response_url;
+
+    console.log('ayyyy', payload);
+
+    try {
+        await axios({
+            method: 'post',
+            url: url,
+            data: {
+                response_type: 'in_channel',
+                text: 'ay'
+            }
+        });
+    } catch (e) {
+        return h.response().code(500);
+    }
+    return h.response().code(200);
+}
+
 async function help (request, h) {
     const payload = request.payload;
     const url = payload.response_url;
@@ -92,6 +113,8 @@ async function handleCommand (request, h) {
         return help(request, h);
     case 'scrabble':
         return scrabble(request, h, commandInfo.commandText);
+    case 'roshambo':
+        return roshambo(request, h, commandInfo.commandText);
     default:
         return help(request, h);
     }
