@@ -1,7 +1,7 @@
 'use strict';
 
 const hapi = require('hapi');
-const handlers = require('./handlers');
+const serverHandlers = require('./serverHandlers');
 
 // Create a server with a host and port
 const server = hapi.server({
@@ -12,7 +12,7 @@ const server = hapi.server({
 server.route({
     method: 'POST',
     path: '/claybot',
-    handler: handlers.clayBot
+    handler: serverHandlers.clayBot
 });
 
 // Start the server
