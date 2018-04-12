@@ -49,7 +49,34 @@ async function roshambo (request, h, commandText) {
     const payload = request.payload;
     const url = payload.response_url;
 
-    console.log('ayyyy', payload);
+    const roshamboRegex = /(rock|paper|scissors)\s(<@\w+\|\w+>)/igm;
+    if (!roshamboRegex.test(commandText)) {
+        await axios({
+            method: 'post',
+            url: url,
+            data: {
+                response_type: 'in_channel',
+                text: 'Roshambo must initiated with `/claybot roshambo [rock|paper|scissors] [@username]`'
+            }
+        });
+        return h.response().code(200);
+    }
+    roshamboRegex.lastIndex = 0; // reset regex due to /g flag
+    const matches = roshamboRegex.exec(commandText);
+
+    const move = matches[1];
+    const opponent = matches[2];
+
+    // const games = [
+    //     {
+    //         from: '<clay>',
+    //         to: '<calvin>',
+    //         intialMove: 'rock'
+    //     }
+    // ];
+
+    console.log('move', move);
+    console.log('opponent', opponent);
 
     try {
         await axios({
