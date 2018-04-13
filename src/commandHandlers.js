@@ -87,10 +87,11 @@ async function scrabble (request, h, commandText) {
  * @param {*} commandText The text of the command without the command name
  */
 async function roshambo (request, h, commandText) {
-    const roshamboRegex = /(rock|paper|scissors)\s<@(\w+)?\|?(\w+)?>/igm;
+    const roshamboRegex = /<@(\w+)?\|?(\w+)?>\s(rock|paper|scissors)/igm;
     if (!roshamboRegex.test(commandText)) {
-        return respond(request, h, 'Roshambo must initiated with `/claybot roshambo [rock|paper|scissors] [@username]`', false);
+        return respond(request, h, 'Roshambo must initiated with `/claybot roshambo @username [rock|paper|scissors]`', false);
     }
+
     roshamboRegex.lastIndex = 0; // reset regex due to /g flag
     const matches = roshamboRegex.exec(commandText);
 
@@ -138,7 +139,7 @@ async function roshambo (request, h, commandText) {
         targetPlayer: targetPlayer,
         initialMove: move
     });
-    return respond(request, h, `<@${currentPlayer}> has challenged <@${targetPlayer}> to a roshambo match! Respond with \`/claybot roshambo [rock|paper|scissors] [@${request.payload.user_name}]\``, true);
+    return respond(request, h, `<@${currentPlayer}> has challenged <@${targetPlayer}> to a roshambo match! Respond with \`/claybot roshambo @${request.payload.user_name} [rock|paper|scissors]\``, true);
 }
 
 /**
@@ -167,13 +168,13 @@ async function help (request, h) {
                                 short: false
                             },
                             {
-                                title: 'scrabble [text]',
-                                value: 'Turns [text] into scrabble letters',
+                                title: 'scrabble _text_',
+                                value: 'Turns _text_ into scrabble letters\n_Example:_ `/claybot scrabble Hey man`',
                                 short: false
                             },
                             {
-                                title: 'roshambo [rock|paper|scissors] [@username]',
-                                value: 'Challenges [@username] to a game of Rock, Paper, Scissors',
+                                title: 'roshambo _@username_ _[rock|paper|scissors]_',
+                                value: 'Challenges _@username_ to a game of Rock, Paper, Scissors\n_Example:_ `/claybot roshambo @cbenson paper`',
                                 short: false
                             }
                         ],
