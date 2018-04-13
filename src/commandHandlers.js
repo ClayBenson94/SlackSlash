@@ -95,9 +95,12 @@ async function roshambo (request, h, commandText) {
     roshamboRegex.lastIndex = 0; // reset regex due to /g flag
     const matches = roshamboRegex.exec(commandText);
 
-    const move = matches[1].toLowerCase();
+    console.log('======');
+    console.log(matches);
+
+    const move = matches[3].toLowerCase();
     const currentPlayer = request.payload.user_id;
-    const targetPlayer = matches[2];
+    const targetPlayer = matches[1];
 
     // If there already exists a game that you made against the same player (duplicate game)
     const duplicateGame = roshamboGames.find((game) => {
