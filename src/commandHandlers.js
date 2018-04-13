@@ -10,8 +10,13 @@ const axios = require('axios');
 //         initialMove: 'rock'
 //     }
 // ];
+// Initialize list of active games
 let roshamboGames = [];
 
+/**
+ * Gets info about a specific command, splitting off the command name and the remaining text into 2 properties
+ * @param {*} text The input text from the user
+ */
 function getCommandInfo (text) {
     const splitText = text.split(' ');
     const commandName = splitText[0];
@@ -28,6 +33,13 @@ function getCommandInfo (text) {
     };
 }
 
+/**
+ * Responds to the slack `response_url` with the given text. Optionally can respond in channel or ephemerally
+ * @param {*} request The hapi request object
+ * @param {*} h The hapi response toolkit
+ * @param {*} text The text to respond with
+ * @param {*} respondInChannel Whether or not to respond in channel (or ephemeral)
+ */
 async function respond (request, h, text, respondInChannel) {
     const url = request.payload.response_url;
     try {
@@ -45,6 +57,12 @@ async function respond (request, h, text, respondInChannel) {
     return h.response().code(200);
 }
 
+/**
+ * Convert text into scrabble emojis
+ * @param {*} request The hapi request object
+ * @param {*} h The hapi response toolkit
+ * @param {*} commandText The text of the command without the command name
+ */
 async function scrabble (request, h, commandText) {
     const goodChars = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
     let output = '';
@@ -62,11 +80,12 @@ async function scrabble (request, h, commandText) {
     }
 }
 
-// roshamboGames.push({
-//     initiatingPlayer: currentPlayer,
-//     targetPlayer: targetPlayer,
-//     initialMove: move
-// });
+/**
+ * Handles roshambo commands. Will handle the creation of games and the response to games
+ * @param {*} request The hapi request object
+ * @param {*} h The hapi response toolkit
+ * @param {*} commandText The text of the command without the command name
+ */
 async function roshambo (request, h, commandText) {
     const roshamboRegex = /(rock|paper|scissors)\s<@(\w+)?\|?(\w+)?>/igm;
     if (!roshamboRegex.test(commandText)) {
@@ -94,19 +113,22 @@ async function roshambo (request, h, commandText) {
         const gameToRespondTo = JSON.parse(JSON.stringify(roshamboGames[gameToRespondToIndex]));
         // Remove the game
         roshamboGames.splice(gameToRespondToIndex, 1);
-        switch(gameToRespondTo.initialMove) {
+        switch (gameToRespondTo.initialMove) {
         case 'rock':
             if (move === 'rock') return respond(request, h, `Your rocks clash together, resulting in a tie between <@${gameToRespondTo.initiatingPlayer}> and <@${gameToRespondTo.targetPlayer}>!`, true);
             if (move === 'paper') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s rock gets covered by <@${gameToRespondTo.targetPlayer}>'s paper, which somehow is a victory!`, true);
             if (move === 'scissors') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s rock smashes <@${gameToRespondTo.targetPlayer}>'s scissors to smithereens!`, true);
+            break;
         case 'paper':
             if (move === 'rock') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s paper covers <@${gameToRespondTo.targetPlayer}>'s rock, which somehow is a victory!`, true);
             if (move === 'paper') return respond(request, h, `Your papers flutter in the wind, resulting in a tie between <@${gameToRespondTo.initiatingPlayer}> and <@${gameToRespondTo.targetPlayer}>!`, true);
             if (move === 'scissors') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s paper is sliced into oragami by <@${gameToRespondTo.targetPlayer}>'s scissors!`, true);
+            break;
         case 'scissors':
             if (move === 'rock') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s scissors get smashed to smithereens by <@${gameToRespondTo.targetPlayer}>'s rock!`, true);
             if (move === 'paper') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s scissors slice <@${gameToRespondTo.targetPlayer}> paper into oragami!`, true);
             if (move === 'scissors') return respond(request, h, `Your scissors clang together like swords in battle, resulting in a tie between <@${gameToRespondTo.initiatingPlayer}> and <@${gameToRespondTo.targetPlayer}>!`, true);
+            break;
         }
     }
 
@@ -119,6 +141,11 @@ async function roshambo (request, h, commandText) {
     return respond(request, h, `<@${currentPlayer}> has challenged <@${targetPlayer}> to a roshambo match! Respond with \`/claybot roshambo [rock|paper|scissors] [@${request.payload.user_name}]\``, true);
 }
 
+/**
+ * Prints a usage message to the user listing out various commands
+ * @param {*} request The hapi request object
+ * @param {*} h The hapi response toolkit
+ */
 async function help (request, h) {
     const url = request.payload.response_url;
 
@@ -143,6 +170,11 @@ async function help (request, h) {
                                 title: 'scrabble [text]',
                                 value: 'Turns [text] into scrabble letters',
                                 short: false
+                            },
+                            {
+                                title: 'roshambo [rock|paper|scissors] [@username]',
+                                value: 'Challenges [@username] to a game of Rock, Paper, Scissors',
+                                short: false
                             }
                         ],
                         footer: 'ClayBot'
@@ -156,6 +188,11 @@ async function help (request, h) {
     return h.response().code(200);
 }
 
+/**
+ * Maps the incoming command to the appropriate handler function
+ * @param {*} request The hapi request object
+ * @param {*} h The hapi response toolkit
+ */
 async function handleCommand (request, h) {
     const payload = request.payload;
 
