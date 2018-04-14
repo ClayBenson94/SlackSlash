@@ -1,17 +1,10 @@
 'use strict';
 
 const axios = require('axios');
+const { Client } = require('pg');
 
-// Test game between Calvin (initiator) and Clay (recipient)
-// let roshamboGames = [
-//     {
-//         initiatingPlayer: 'U5FQVBB4Y',
-//         targetPlayer: 'U69CFAWS0',
-//         initialMove: 'rock'
-//     }
-// ];
-// Initialize list of active games
-let roshamboGames = [];
+const postgres = new Client();
+postgres.connect();
 
 /**
  * Gets info about a specific command, splitting off the command name and the remaining text into 2 properties
@@ -95,53 +88,48 @@ async function roshambo (request, h, commandText) {
     roshamboRegex.lastIndex = 0; // reset regex due to /g flag
     const matches = roshamboRegex.exec(commandText);
 
-    console.log('======');
-    console.log(matches);
-
     const move = matches[3].toLowerCase();
     const currentPlayer = request.payload.user_id;
     const targetPlayer = matches[1];
 
-    // If there already exists a game that you made against the same player (duplicate game)
-    const duplicateGame = roshamboGames.find((game) => {
-        return ((game.initiatingPlayer === currentPlayer) && (game.targetPlayer === targetPlayer));
-    });
-    if (duplicateGame) {
-        return respond(request, h, `You have already challenged <@${targetPlayer}> to a match. (Hint: You played \`${duplicateGame.initialMove}\`)`, false);
+    // If you try and challenge yourself
+    if (currentPlayer === targetPlayer) {
+        return respond(request, h, 'You cannot challenge yourself, fool! Get back to work!', false);
     }
 
-    const gameToRespondToIndex = roshamboGames.findIndex((game) => {
-        return ((game.initiatingPlayer === targetPlayer) && (game.targetPlayer === currentPlayer));
-    });
-    if (gameToRespondToIndex >= 0) {
-        const gameToRespondTo = JSON.parse(JSON.stringify(roshamboGames[gameToRespondToIndex]));
+    // If there already exists a game that you made against the same player (duplicate game)
+    let duplicateGameResponse = await postgres.query('SELECT * FROM roshambo_games WHERE initiating_player = $1 AND target_player = $2;', [currentPlayer, targetPlayer]);
+    if (duplicateGameResponse.rows.length > 0) {
+        const duplicateGame = duplicateGameResponse.rows[0]
+        return respond(request, h, `You have already challenged <@${targetPlayer}> to a match. (Hint: You played \`${duplicateGame.initial_move}\`)`, false);
+    }
+
+    let gameToRespondToResponse = await postgres.query('SELECT * FROM roshambo_games WHERE initiating_player = $1 AND target_player = $2;', [targetPlayer, currentPlayer]);
+    if (gameToRespondToResponse.rows.length > 0) {
+        const gameToRespondTo = gameToRespondToResponse.rows[0];
         // Remove the game
-        roshamboGames.splice(gameToRespondToIndex, 1);
-        switch (gameToRespondTo.initialMove) {
+        await postgres.query('DELETE FROM roshambo_games WHERE initiating_player = $1 AND target_player = $2;', [targetPlayer, currentPlayer]);
+        switch (gameToRespondTo.initial_move) {
         case 'rock':
-            if (move === 'rock') return respond(request, h, `Your rocks clash together, resulting in a tie between <@${gameToRespondTo.initiatingPlayer}> and <@${gameToRespondTo.targetPlayer}>!`, true);
-            if (move === 'paper') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s rock gets covered by <@${gameToRespondTo.targetPlayer}>'s paper, which somehow is a victory!`, true);
-            if (move === 'scissors') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s rock smashes <@${gameToRespondTo.targetPlayer}>'s scissors to smithereens!`, true);
+            if (move === 'rock') return respond(request, h, `Your rocks clash together, resulting in a tie between <@${gameToRespondTo.initiating_player}> and <@${gameToRespondTo.target_player}>!`, true);
+            if (move === 'paper') return respond(request, h, `<@${gameToRespondTo.initiating_player}>'s rock gets covered by <@${gameToRespondTo.target_player}>'s paper, which somehow is a victory!`, true);
+            if (move === 'scissors') return respond(request, h, `<@${gameToRespondTo.initiating_player}>'s rock smashes <@${gameToRespondTo.target_player}>'s scissors to smithereens!`, true);
             break;
         case 'paper':
-            if (move === 'rock') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s paper covers <@${gameToRespondTo.targetPlayer}>'s rock, which somehow is a victory!`, true);
-            if (move === 'paper') return respond(request, h, `Your papers flutter in the wind, resulting in a tie between <@${gameToRespondTo.initiatingPlayer}> and <@${gameToRespondTo.targetPlayer}>!`, true);
-            if (move === 'scissors') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s paper is sliced into oragami by <@${gameToRespondTo.targetPlayer}>'s scissors!`, true);
+            if (move === 'rock') return respond(request, h, `<@${gameToRespondTo.initiating_player}>'s paper covers <@${gameToRespondTo.target_player}>'s rock, which somehow is a victory!`, true);
+            if (move === 'paper') return respond(request, h, `Your papers flutter in the wind, resulting in a tie between <@${gameToRespondTo.initiating_player}> and <@${gameToRespondTo.target_player}>!`, true);
+            if (move === 'scissors') return respond(request, h, `<@${gameToRespondTo.initiating_player}>'s paper is sliced into oragami by <@${gameToRespondTo.target_player}>'s scissors!`, true);
             break;
         case 'scissors':
-            if (move === 'rock') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s scissors get smashed to smithereens by <@${gameToRespondTo.targetPlayer}>'s rock!`, true);
-            if (move === 'paper') return respond(request, h, `<@${gameToRespondTo.initiatingPlayer}>'s scissors slice <@${gameToRespondTo.targetPlayer}> paper into oragami!`, true);
-            if (move === 'scissors') return respond(request, h, `Your scissors clang together like swords in battle, resulting in a tie between <@${gameToRespondTo.initiatingPlayer}> and <@${gameToRespondTo.targetPlayer}>!`, true);
+            if (move === 'rock') return respond(request, h, `<@${gameToRespondTo.initiating_player}>'s scissors get smashed to smithereens by <@${gameToRespondTo.target_player}>'s rock!`, true);
+            if (move === 'paper') return respond(request, h, `<@${gameToRespondTo.initiating_player}>'s scissors slice <@${gameToRespondTo.target_player}> paper into oragami!`, true);
+            if (move === 'scissors') return respond(request, h, `Your scissors clang together like swords in battle, resulting in a tie between <@${gameToRespondTo.initiating_player}> and <@${gameToRespondTo.target_player}>!`, true);
             break;
         }
     }
 
     // Else, no game exists, so let's make one!
-    roshamboGames.push({
-        initiatingPlayer: currentPlayer,
-        targetPlayer: targetPlayer,
-        initialMove: move
-    });
+    await postgres.query('INSERT INTO roshambo_games(initiating_player, target_player, initial_move) VALUES($1, $2, $3) RETURNING *;', [currentPlayer, targetPlayer, move]);
     return respond(request, h, `<@${currentPlayer}> has challenged <@${targetPlayer}> to a roshambo match! Respond with \`/claybot roshambo @${request.payload.user_name} [rock|paper|scissors]\``, true);
 }
 
