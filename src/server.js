@@ -1,7 +1,7 @@
 'use strict';
 
 const hapi = require('hapi');
-const commandHandlers = require('./commandHandlers');
+const commandHandler = require('./commands/commandHandler');
 
 // Create a server with a host and port
 const server = hapi.server({
@@ -25,7 +25,7 @@ server.route({
             }).code(401);
         }
 
-        return commandHandlers.handleCommand(request, h);
+        return commandHandler.handleCommand(request, h);
     }
 });
 
