@@ -1,7 +1,7 @@
 'use strict';
 
 const hapi = require('hapi');
-const serverHandlers = require('./serverHandlers');
+const commandHandlers = require('./commandHandlers');
 
 // Create a server with a host and port
 const server = hapi.server({
@@ -12,7 +12,21 @@ const server = hapi.server({
 server.route({
     method: 'POST',
     path: '/claybot',
-    handler: serverHandlers.clayBot
+    handler: (request, h) => {
+        const payload = request.payload;
+        if (!payload || Object.keys(payload).length === 0) {
+            return h.response({
+                error: 'Empty payload received'
+            }).code(400);
+        }
+        if (payload.token !== process.env.SLACK_TOKEN) {
+            return h.response({
+                error: 'Invalid token'
+            }).code(401);
+        }
+
+        return commandHandlers.handleCommand(request, h);
+    }
 });
 
 // Start the server
