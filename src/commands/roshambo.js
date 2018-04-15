@@ -1,5 +1,6 @@
 const { Client } = require('pg');
 const respond = require('./commandUtilities').respond;
+const respondAttachments = require('./commandUtilities').respondAttachments;
 
 const postgres = new Client();
 postgres.connect();
@@ -8,21 +9,11 @@ postgres.connect();
  * Handles roshambo commands. Will handle the creation of games and the response to games
  * @param {*} request The hapi request object
  * @param {*} h The hapi response toolkit
- * @param {*} commandText The text of the command without the command name
+ * @param {*} move The move being made
+ * @param {*} currentPlayer The player making the move
+ * @param {*} targetPlayer The player being targeted by the move
  */
-async function roshambo (request, h, commandText) {
-    const roshamboRegex = /<@(\w+)?\|?(\w+)?>\s(rock|paper|scissors)/igm;
-    if (!roshamboRegex.test(commandText)) {
-        return respond(request, h, 'Roshambo must initiated with `/claybot roshambo @username [rock|paper|scissors]`', false);
-    }
-
-    roshamboRegex.lastIndex = 0; // reset regex due to /g flag
-    const matches = roshamboRegex.exec(commandText);
-
-    const move = matches[3].toLowerCase();
-    const currentPlayer = request.payload.user_id;
-    const targetPlayer = matches[1];
-
+async function roshamboGame (request, h, move, currentPlayer, targetPlayer) {
     // If you try and challenge yourself
     if (currentPlayer === targetPlayer) {
         return respond(request, h, 'You cannot challenge yourself, fool! Get back to work!', false);
@@ -118,6 +109,71 @@ async function roshambo (request, h, commandText) {
     // Else, no game exists, so let's make one!
     await postgres.query('INSERT INTO roshambo_games(initiating_player, target_player, initial_move) VALUES($1, $2, $3) RETURNING *;', [currentPlayer, targetPlayer, move]);
     return respond(request, h, `<@${currentPlayer}> has challenged <@${targetPlayer}> to a roshambo match! Respond with \`/claybot roshambo @${request.payload.user_name} [rock|paper|scissors]\``, true);
+}
+
+/**
+ * Gets statistics on a certain users roshambo games
+ * @param {*} request The hapi request object
+ * @param {*} h The hapi response toolkit
+ * @param {*} userId The id of the player to get stats on
+ */
+async function roshamboStats (request, h, userId) {
+    const statsResponse = await postgres.query('SELECT * FROM roshambo_stats WHERE player = $1;', [userId]);
+    if (statsResponse.rows[0]) {
+        const stats = statsResponse.rows[0];
+        return respondAttachments(request, h, [
+            {
+                fallback: 'Statistics for user',
+                color: '#36a64f',
+                pretext: `Statistics for <@${userId}>`,
+                fields: [
+                    {
+                        title: 'Wins / Losses / Ties',
+                        value: `${stats.wins} / ${stats.losses} / ${stats.ties}`,
+                        short: false
+                    },
+                    {
+                        title: 'Rocks / Papers / Scissors played',
+                        value: `${stats.num_rocks_played} / ${stats.num_papers_played} / ${stats.num_scissors_played}`,
+                        short: false
+                    }
+                ],
+                footer: 'Claybot'
+            }
+        ], false);
+    } else {
+        return respond(request, h, `There are no stats yet for <@${userId}>`, false);
+    }
+}
+
+/**
+ * Handles roshambo commands. Will handle the creation of games and the response to games, as well as `stats` commands
+ * @param {*} request The hapi request object
+ * @param {*} h The hapi response toolkit
+ * @param {*} commandText The text of the command without the command name
+ */
+async function roshambo (request, h, commandText) {
+    const roshamboRegex = /<@(\w+)?\|?(\w+)?>\s(rock|paper|scissors)/igm;
+    const roshamboStatsRegex = /stats\s*(<@(\w+)\|?\w*>)?/igm;
+
+    if (roshamboRegex.test(commandText)) {
+        roshamboRegex.lastIndex = 0; // reset regex due to /g flag
+        const matches = roshamboRegex.exec(commandText);
+
+        const move = matches[3].toLowerCase();
+        const currentPlayer = request.payload.user_id;
+        const targetPlayer = matches[1];
+        return roshamboGame(request, h, move, currentPlayer, targetPlayer);
+    } else if (roshamboStatsRegex.test(commandText)) {
+        roshamboStatsRegex.lastIndex = 0;
+        const matches = roshamboStatsRegex.exec(commandText);
+
+        const userId = matches[2] || request.payload.user_id;
+
+        return roshamboStats(request, h, userId);
+    } else {
+        return respond(request, h, 'Roshambo syntax incorrect. See `/claybot help` for examples', false);
+    }
 }
 
 module.exports = roshambo;
