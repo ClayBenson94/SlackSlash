@@ -133,12 +133,12 @@ async function roshamboHelp (request, h) {
             pretext: 'The following commands are available for /roshambo',
             fields: [
                 {
-                    title: 'roshambo _@username_ _move_',
+                    title: '/roshambo _@username_ _move_',
                     value: 'Challenges _@username_ to a game of Rock, Paper, Scissors\n_Example:_ `/roshambo @cbenson paper`',
                     short: false
                 },
                 {
-                    title: 'roshambo stats _@username_',
+                    title: '/roshambo stats _@username_',
                     value: 'List out the stats for _@username_. Defaults to yourself if _@username_ is not specified',
                     short: false
                 }
