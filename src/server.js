@@ -13,18 +13,6 @@ server.route({
     method: 'POST',
     path: '/claybot',
     handler: (request, h) => {
-        const payload = request.payload;
-        if (!payload || Object.keys(payload).length === 0) {
-            return h.response({
-                error: 'Empty payload received'
-            }).code(400);
-        }
-        if (payload.token !== process.env.SLACK_TOKEN) {
-            return h.response({
-                error: 'Invalid token'
-            }).code(401);
-        }
-
         return commandHandler.handleCommand(request, h);
     }
 });

@@ -125,6 +125,34 @@ async function roshamboStats (request, h, userId) {
     }
 }
 
+async function roshamboHelp (request, h) {
+    return respondAttachments(request, h, [
+        {
+            fallback: 'Usage message for /roshambo',
+            color: '#36a64f',
+            pretext: 'The following commands are available for /roshambo',
+            fields: [
+                {
+                    title: '/roshambo help',
+                    value: 'Print this message',
+                    short: false
+                },
+                {
+                    title: 'roshambo _@username_ _move_',
+                    value: 'Challenges _@username_ to a game of Rock, Paper, Scissors\n_Example:_ `/roshambo @cbenson paper`',
+                    short: false
+                },
+                {
+                    title: 'roshambo stats _@username_',
+                    value: 'List out the stats for _@username_. Defaults to yourself if _@username_ is not specified',
+                    short: false
+                }
+            ],
+            footer: 'Claybot'
+        }
+    ], false);
+}
+
 /**
  * Handles roshambo commands. Will handle the creation of games and the response to games, as well as `stats` commands
  * @param {*} request The hapi request object
@@ -132,12 +160,15 @@ async function roshamboStats (request, h, userId) {
  * @param {*} commandText The text of the command without the command name
  */
 async function roshambo (request, h, commandText) {
-    const roshamboRegex = /<@(\w+)?\|?(\w+)?>\s(rock|paper|scissors)/igm;
+    const roshamboHelpRegex = /help/igm;
+    const roshamboGameRegex = /<@(\w+)?\|?(\w+)?>\s(rock|paper|scissors)/igm;
     const roshamboStatsRegex = /stats\s*(<@(\w+)\|?\w*>)?/igm;
 
-    if (roshamboRegex.test(commandText)) {
-        roshamboRegex.lastIndex = 0; // reset regex due to /g flag
-        const matches = roshamboRegex.exec(commandText);
+    if (roshamboHelpRegex.test(commandText)) {
+        return roshamboHelp(request, h);
+    } else if (roshamboGameRegex.test(commandText)) {
+        roshamboGameRegex.lastIndex = 0; // reset regex due to /g flag
+        const matches = roshamboGameRegex.exec(commandText);
 
         const move = matches[3].toLowerCase();
         const currentPlayer = request.payload.user_id;
@@ -151,7 +182,7 @@ async function roshambo (request, h, commandText) {
 
         return roshamboStats(request, h, userId);
     } else {
-        return respond(request, h, 'Roshambo syntax incorrect. See `/claybot help` for examples', false);
+        return roshamboHelp(request, h);
     }
 }
 
