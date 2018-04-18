@@ -80,7 +80,7 @@ async function roshamboGame (request, h, move, currentPlayer, targetPlayer) {
 
     // Else, no game exists, so let's make one!
     await postgres.query('INSERT INTO roshambo_games(initiating_player, target_player, initial_move) VALUES($1, $2, $3) RETURNING *;', [currentPlayer, targetPlayer, move]);
-    return respond(request, h, `<@${currentPlayer}> has challenged <@${targetPlayer}> to a roshambo match! Respond with \`/claybot roshambo @${request.payload.user_name} [rock|paper|scissors]\``, true);
+    return respond(request, h, `<@${currentPlayer}> has challenged <@${targetPlayer}> to a roshambo match! Respond with \`/roshambo @${request.payload.user_name} [rock|paper|scissors]\``, true);
 }
 
 /**
