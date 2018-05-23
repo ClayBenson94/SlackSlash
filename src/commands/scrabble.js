@@ -17,7 +17,7 @@ async function scrabble (request, h, commandText) {
     }
 
     if (output.length > 0) {
-        return respond(request, h, output, true);
+        return respond(request, h, `<@${request.payload.user_id}>\noutput`, true);
     } else {
         return respond(request, h, 'Scrabble command must be invoked with text', false);
     }
