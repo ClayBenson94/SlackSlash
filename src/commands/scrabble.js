@@ -1,12 +1,12 @@
-const respond = require('./commandUtilities').respond;
+const respond = require('../utilities/responseUtilities').respond;
 
 /**
  * Convert text into scrabble emojis
- * @param {*} request The hapi request object
+ * @param {*} payload The slack payload object
  * @param {*} h The hapi response toolkit
- * @param {*} commandText The text of the command without the command name
  */
-async function scrabble (request, h, commandText) {
+async function scrabble (payload, h) {
+    const commandText = payload.text;
     const goodChars = [' ', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'];
     let output = '';
     for (let i = 0; i < commandText.length; i++) {
@@ -17,9 +17,9 @@ async function scrabble (request, h, commandText) {
     }
 
     if (output.length > 0) {
-        return respond(request, h, `<@${request.payload.user_id}>\n${output}`, true);
+        return respond(payload, h, `<@${payload.user_id}>\n${output}`, true);
     } else {
-        return respond(request, h, 'Scrabble command must be invoked with text', false);
+        return respond(payload, h, 'Scrabble command must be invoked with text', false);
     }
 }
 

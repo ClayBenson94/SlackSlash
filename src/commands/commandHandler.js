@@ -25,13 +25,13 @@ async function handleCommand (request, h) {
 
     switch (payload.command) {
     case '/claybot':
-        return help(request, h);
+        return help(payload, h);
     case '/scrabble':
-        return scrabble(request, h, payload.text);
+        return scrabble(payload, h);
     case '/roshambo':
-        return roshambo(request, h, payload.text);
+        return roshambo(payload, h);
     default:
-        return help(request, h);
+        return help(payload, h);
     }
 }
 

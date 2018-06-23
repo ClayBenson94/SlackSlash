@@ -4,13 +4,13 @@ const axios = require('axios');
 
 /**
  * Responds to the slack `response_url` with the given text. Optionally can respond in channel or ephemerally
- * @param {*} request The hapi request object
+ * @param {*} payload The slack payload object
  * @param {*} h The hapi response toolkit
  * @param {*} text The text to respond with
  * @param {*} respondInChannel Whether or not to respond in channel (or ephemeral)
  */
-async function respond (request, h, text, respondInChannel) {
-    const url = request.payload.response_url;
+async function respond (payload, h, text, respondInChannel) {
+    const url = payload.response_url;
     try {
         await axios({
             method: 'post',
@@ -28,13 +28,13 @@ async function respond (request, h, text, respondInChannel) {
 
 /**
  * Responds to the slack `response_url` with the given text. Optionally can respond in channel or ephemerally
- * @param {*} request The hapi request object
+ * @param {*} payload The slack payload object
  * @param {*} h The hapi response toolkit
  * @param {*} attachments The attachments object
  * @param {*} respondInChannel Whether or not to respond in channel (or ephemeral)
  */
-async function respondAttachments (request, h, attachments, respondInChannel) {
-    const url = request.payload.response_url;
+async function respondAttachments (payload, h, attachments, respondInChannel) {
+    const url = payload.response_url;
     try {
         await axios({
             method: 'post',

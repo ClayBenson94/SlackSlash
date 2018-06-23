@@ -2,19 +2,23 @@
 
 const hapi = require('hapi');
 const commandHandler = require('./commands/commandHandler');
+const actionHandler = require('./actions/actionHandler');
 
 // Create a server with a host and port
 const server = hapi.server({
     port: process.env.PORT || 5337
 });
 
-// Add the route
+// Add the routes
 server.route({
     method: 'POST',
     path: '/claybot',
-    handler: (request, h) => {
-        return commandHandler.handleCommand(request, h);
-    }
+    handler: commandHandler.handleCommand
+});
+server.route({
+    method: 'POST',
+    path: '/claybot-action',
+    handler: actionHandler.handleAction
 });
 
 // Start the server
