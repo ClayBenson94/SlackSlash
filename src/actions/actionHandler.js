@@ -17,7 +17,7 @@ async function handleAction (request, h) {
             error: 'Empty payload received'
         }).code(400);
     }
-    if (payload.token !== process.env.SLACK_TOKEN) {
+    if (payload.token !== process.env.VERIFICATION_TOKEN) {
         return h.response({
             error: 'Invalid token'
         }).code(401);
