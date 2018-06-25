@@ -1,3 +1,5 @@
+const respond = require('./../utilities/responseUtilities').respond;
+
 /**
  * Handles 'reported' commands.
  * @param {*} payload The slack payload object
@@ -6,6 +8,10 @@
 async function reported (payload, h) {
     const WebClient = require('@slack/client').WebClient;
     const slackWeb = new WebClient(process.env.SLACK_TOKEN);
+
+    if (payload.channel.name === 'directmessage') {
+        return respond(payload, h, 'You cannot report messages in a direct message', false);
+    }
 
     if (payload.message.user) {
         let reactions = await slackWeb.reactions.get({ channel: payload.channel.id, timestamp: payload.message.ts, full: true });
