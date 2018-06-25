@@ -23,15 +23,21 @@ async function handleCommand (request, h) {
         }).code(401);
     }
 
-    switch (payload.command) {
-    case '/claybot':
-        return help(payload, h);
-    case '/scrabble':
-        return scrabble(payload, h);
-    case '/roshambo':
-        return roshambo(payload, h);
-    default:
-        return help(payload, h);
+    try {
+        switch (payload.command) {
+        case '/claybot':
+            return help(payload, h);
+        case '/scrabble':
+            return scrabble(payload, h);
+        case '/roshambo':
+            return roshambo(payload, h);
+        default:
+            return help(payload, h);
+        }
+    } catch (error) {
+        console.error('Error occured in commandHandler.js');
+        console.error(error);
+        return h.response().code(500);
     }
 }
 

@@ -9,8 +9,8 @@ async function reported (payload, h) {
     const WebClient = require('@slack/client').WebClient;
     const slackWeb = new WebClient(process.env.SLACK_TOKEN);
 
-    if (payload.channel.name === 'directmessage') {
-        return respond(payload, h, 'You cannot report messages in a direct message', false);
+    if (payload.channel.name === 'directmessage' || payload.channel.name === 'privategroup') {
+        return respond(payload, h, 'You can only report messages in a channel (no DMs or Group Chats)', false);
     }
 
     if (payload.message.user) {

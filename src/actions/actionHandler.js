@@ -23,11 +23,17 @@ async function handleAction (request, h) {
         }).code(401);
     }
 
-    switch (payload.callback_id) {
-    case 'report_cops':
-        return reported(payload, h);
-    default:
-        return respond(payload, h, `Invalid action id "${payload.callback_id}"`, false);
+    try {
+        switch (payload.callback_id) {
+        case 'report_cops':
+            return reported(payload, h);
+        default:
+            return respond(payload, h, `Invalid action id "${payload.callback_id}"`, false);
+        }
+    } catch (error) {
+        console.error('Error occured in actionHandler.js');
+        console.error(error);
+        return h.response().code(500);
     }
 }
 
