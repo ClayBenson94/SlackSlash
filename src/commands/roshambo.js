@@ -141,6 +141,11 @@ async function roshamboHelp (payload, h) {
                     title: '/roshambo stats _@username_',
                     value: 'List out the stats for _@username_. Defaults to yourself if _@username_ is not specified',
                     short: false
+                },
+                {
+                    title: '/roshambo clear _@username_',
+                    value: 'Clears the game between you and _@username_, if there is one. Useful if you accidentally started a game!',
+                    short: false
                 }
             ],
             footer: 'Claybot'
