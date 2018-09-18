@@ -189,7 +189,7 @@ async function roshambo (payload, h) {
         return roshamboStats(payload, h, userId);
     } else if (roshamboClearRegex.test(commandText)) {
         roshamboClearRegex.lastIndex = 0;
-        const matches = roshamboStatsRegex.exec(commandText);
+        const matches = roshamboClearRegex.exec(commandText);
 
         const userId = matches[2];
 
