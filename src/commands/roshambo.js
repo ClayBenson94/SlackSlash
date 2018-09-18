@@ -148,6 +148,16 @@ async function roshamboHelp (payload, h) {
     ], false);
 }
 
+async function roshamboClear (payload, h, targetPlayer) {
+    let currentPlayer = payload.user_id;
+    let gameToClearResponse = await postgres.query('SELECT * FROM roshambo_games WHERE initiating_player = $1 AND target_player = $2;', [currentPlayer, targetPlayer]);
+    if (gameToClearResponse.rows[0]) {
+        await postgres.query('DELETE FROM roshambo_games WHERE initiating_player = $1 AND target_player = $2;', [currentPlayer, targetPlayer]);
+        return respond(payload, h, `Game cleared with <@${targetPlayer}>!`, false);
+    }
+    return respond(payload, h, `There is not currently a game between you and <@${targetPlayer}>!`, false);
+}
+
 /**
  * Handles roshambo commands. Will handle the creation of games and the response to games, as well as `stats` commands
  * @param {*} payload The slack payload object
@@ -158,6 +168,7 @@ async function roshambo (payload, h) {
     const roshamboHelpRegex = /help/igm;
     const roshamboGameRegex = /<@(\w+)?\|?(\w+)?>\s(rock|paper|scissors)/igm;
     const roshamboStatsRegex = /stats\s*(<@(\w+)\|?\w*>)?/igm;
+    const roshamboClearRegex = /clear\s*(<@(\w+)\|?\w*>)/igm;
 
     if (roshamboHelpRegex.test(commandText)) {
         return roshamboHelp(payload, h);
@@ -176,6 +187,13 @@ async function roshambo (payload, h) {
         const userId = matches[2] || payload.user_id;
 
         return roshamboStats(payload, h, userId);
+    } else if (roshamboClearRegex.test(commandText)) {
+        roshamboClearRegex.lastIndex = 0;
+        const matches = roshamboStatsRegex.exec(commandText);
+
+        const userId = matches[2];
+
+        return roshamboClear(payload, h, userId);
     } else {
         return roshamboHelp(payload, h);
     }
