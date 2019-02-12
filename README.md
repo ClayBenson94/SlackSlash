@@ -3,7 +3,7 @@ This is a simple Hapi (HTTP) server that responds to requests made by Slack.
 
 ## Installation
 
-After cloning, run `npm install` and ensure that you have a file titled `.env` in the project's root. It should follow the format / variable names as listed in [defualt.env](./default.env).
+After cloning, run `npm install` and ensure that you have a file titled `.env` in the project's root. It should follow the format / variable names as listed in [default.env](./default.env).
 
 When you set up an application in slack, you should be presented with a **Verification Token** under **Basic Information** for your application. This is what should be used for the `VERIFICATION_TOKEN` variable in .env.
 
