@@ -3,6 +3,7 @@
 const help = require('./help');
 const scrabble = require('./scrabble');
 const roshambo = require('./roshambo');
+const catfact = require('./catfact');
 
 /**
  * Maps the incoming command to the appropriate handler function
@@ -31,6 +32,8 @@ async function handleCommand (request, h) {
             return scrabble(payload, h);
         case '/roshambo':
             return roshambo(payload, h);
+        case '/catfact':
+            return catfact(payload, h);
         default:
             return help(payload, h);
         }
