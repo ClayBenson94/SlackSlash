@@ -12,7 +12,10 @@ async function catfact(payload, h) {
         url: 'https://cat-fact.herokuapp.com/facts',
     });
     const allFacts = response.data.all;
-    const randomFact = allFacts[Math.floor(Math.random()*allFacts.length)].text;
+    const allFactsWithUpvotes = allFacts.filter((fact) => {
+        return fact.upvotes.length > 0;
+    });
+    const randomFact = allFactsWithUpvotes[Math.floor(Math.random()*allFactsWithUpvotes.length)].text;
     return respond(payload, h, `<@${payload.user_id}>'s cat fact:\n${randomFact}`, true);
 }
 
