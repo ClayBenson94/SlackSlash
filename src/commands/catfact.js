@@ -9,7 +9,7 @@ const axios = require('axios');
 async function catfact(payload, h) {
     const response = await axios({
         method: 'GET',
-        url: 'https://cat-fact.herokuapp.com/facts',
+        url: 'https://cat-fact.herokuapp.com/facts?animal_type=cat',
     });
     const allFacts = response.data.all;
     const allFactsWithUpvotes = allFacts.filter((fact) => {
