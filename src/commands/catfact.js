@@ -9,14 +9,10 @@ const axios = require('axios');
 async function catfact(payload, h) {
     const response = await axios({
         method: 'GET',
-        url: 'https://cat-fact.herokuapp.com/facts?animal_type=cat',
+        url: 'https://cat-fact.herokuapp.com/facts/random',
     });
-    const allFacts = response.data.all;
-    const allFactsWithUpvotes = allFacts.filter((fact) => {
-        return fact.upvotes.length > 0;
-    });
-    const randomFact = allFactsWithUpvotes[Math.floor(Math.random()*allFactsWithUpvotes.length)].text;
-    return respond(payload, h, `<@${payload.user_id}>'s cat fact:\n${randomFact}`, true);
+    const factText = response.data.text;
+    return respond(payload, h, `<@${payload.user_id}>'s cat fact:\n${factText}`, true);
 }
 
 module.exports = catfact;
