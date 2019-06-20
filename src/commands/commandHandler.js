@@ -25,7 +25,7 @@ async function handleCommand (request, h) {
 
 	try {
 		switch (payload.command) {
-		case '/claybot':
+		case process.env.HELP_COMMAND:
 			return help(payload, h);
 		case '/scrabble':
 			return scrabble(payload, h);

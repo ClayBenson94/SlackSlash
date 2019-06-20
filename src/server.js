@@ -11,7 +11,7 @@ const server = hapi.server({
 // Add the routes
 server.route({
 	method: 'POST',
-	path: '/claybot',
+	path: '/slackslash',
 	handler: commandHandler.handleCommand
 });
 
