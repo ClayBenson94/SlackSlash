@@ -2,7 +2,6 @@
 
 const help = require('./help');
 const scrabble = require('./scrabble');
-const roshambo = require('./roshambo');
 const catfact = require('./catfact');
 
 /**
