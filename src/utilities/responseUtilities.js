@@ -10,20 +10,20 @@ const axios = require('axios');
  * @param {*} respondInChannel Whether or not to respond in channel (or ephemeral)
  */
 async function respond (payload, h, text, respondInChannel) {
-    const url = payload.response_url;
-    try {
-        await axios({
-            method: 'post',
-            url: url,
-            data: {
-                response_type: respondInChannel ? 'in_channel' : 'ephemeral',
-                text: text
-            }
-        });
-    } catch (e) {
-        return h.response().code(500);
-    }
-    return h.response().code(200);
+	const url = payload.response_url;
+	try {
+		await axios({
+			method: 'post',
+			url: url,
+			data: {
+				response_type: respondInChannel ? 'in_channel' : 'ephemeral',
+				text: text
+			}
+		});
+	} catch (e) {
+		return h.response().code(500);
+	}
+	return h.response().code(200);
 }
 
 /**
@@ -34,23 +34,23 @@ async function respond (payload, h, text, respondInChannel) {
  * @param {*} respondInChannel Whether or not to respond in channel (or ephemeral)
  */
 async function respondAttachments (payload, h, attachments, respondInChannel) {
-    const url = payload.response_url;
-    try {
-        await axios({
-            method: 'post',
-            url: url,
-            data: {
-                response_type: respondInChannel ? 'in_channel' : 'ephemeral',
-                attachments: attachments
-            }
-        });
-    } catch (e) {
-        return h.response().code(500);
-    }
-    return h.response().code(200);
+	const url = payload.response_url;
+	try {
+		await axios({
+			method: 'post',
+			url: url,
+			data: {
+				response_type: respondInChannel ? 'in_channel' : 'ephemeral',
+				attachments: attachments
+			}
+		});
+	} catch (e) {
+		return h.response().code(500);
+	}
+	return h.response().code(200);
 }
 
 module.exports = {
-    respond,
-    respondAttachments
+	respond,
+	respondAttachments
 };
