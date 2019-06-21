@@ -2,19 +2,19 @@ const respond = require('../utilities/responseUtilities').respond;
 const axios = require('axios');
 const toHex = require('colornames');
 
-function hexToR(h) {
+function hexToR (h) {
 	return parseInt(cutHex(h).substring(0, 2), 16);
 }
-function hexToG(h) {
+function hexToG (h) {
 	return parseInt(cutHex(h).substring(2, 4), 16);
 }
-function hexToB(h) {
+function hexToB (h) {
 	return parseInt(cutHex(h).substring(4, 6), 16);
 }
-function cutHex(h) {
+function cutHex (h) {
 	return h.charAt(0) === '#' ? h.substring(1, 7) : h;
 }
-function hexToRGB(hex) {
+function hexToRGB (hex) {
 	return {
 		r: hexToR(hex),
 		g: hexToG(hex),
@@ -27,7 +27,7 @@ function hexToRGB(hex) {
  * @param {*} payload The slack payload object
  * @param {*} h The hapi response toolkit
  */
-async function clayLED(payload, h) {
+async function clayLED (payload, h) {
 	const inputColor = payload.text.trim();
 	const hex = toHex(inputColor);
 
