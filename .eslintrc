@@ -2,12 +2,13 @@
     "extends": "standard",
     "rules": {
         "indent": [
-            "warn",
-            "tabs"
+            "error",
+            "tab"
         ],
         "semi": [
-            "warn",
+            "error",
             "always"
-        ]
+        ],
+        "no-tabs": "off"
     }
 }
