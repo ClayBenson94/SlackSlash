@@ -25,14 +25,14 @@ async function handleCommand (request, h) {
 	}
 
 	try {
-		switch (payload.command) {
+		switch (payload.command.toLowerCase()) {
 		case process.env.HELP_COMMAND:
 			return help(payload, h);
 		case '/scrabble':
 			return scrabble(payload, h);
 		case '/catfact':
 			return catfact(payload, h);
-		case '/clayLED':
+		case '/clayled':
 			return clayLED(payload, h);
 		default:
 			return help(payload, h);
