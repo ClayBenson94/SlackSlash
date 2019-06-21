@@ -3,7 +3,7 @@
     "rules": {
         "indent": [
             "warn",
-            4
+            "tabs"
         ],
         "semi": [
             "warn",
