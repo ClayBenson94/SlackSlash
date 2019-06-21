@@ -40,7 +40,7 @@ async function clayLED (payload, h) {
 	try {
 		await axios.get(`http://home.claybenson.me:8333/color?red=${rgb.r}&green=${rgb.g}&blue=${rgb.b}`);
 	} catch (e) {
-        console.error('Error setting color in clayLED',e);
+		console.error('Error setting color in clayLED', e);
 		return respond(payload, h, `Error setting color... something went wrong!`, false);
 	}
 
