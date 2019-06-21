@@ -38,11 +38,10 @@ async function clayLED (payload, h) {
 	const rgb = hexToRGB(hex);
 
 	try {
-		axios.get({
-			url: `https://home.claybenson.me:8333/color?red=${rgb.r}&green=${rgb.g}&blue=${rgb.b}`
-		});
+		await axios.get(`http://home.claybenson.me:8333/color?red=${rgb.r}&green=${rgb.g}&blue=${rgb.b}`);
 	} catch (e) {
-		respond(payload, h, `Error setting color... something went wrong!`, false);
+        console.error('Error setting color in clayLED',e);
+		return respond(payload, h, `Error setting color... something went wrong!`, false);
 	}
 
 	return respond(payload, h, `Successfully set color to ${inputColor}`, false);
