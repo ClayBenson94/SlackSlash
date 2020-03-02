@@ -1,18 +1,29 @@
-const respond = require('../utilities/responseUtilities').respond;
+const slackRespond = require('../utilities').slackRespond;
 const axios = require('axios');
 
-/**
- * Vomit out a random cat fact
- * @param {*} payload The slack payload object
- * @param {*} h The hapi response toolkit
- */
-async function catfact (payload, h) {
-	const response = await axios({
-		method: 'GET',
-		url: 'https://cat-fact.herokuapp.com/facts/random'
+const catFact = async (req, res) => {
+	let catFactResponse;
+	try {
+		catFactResponse = await axios({
+			method: 'GET',
+			url: 'https://cat-fact.herokuapp.com/facts/random'
+		});
+	} catch (e) {
+		console.error('Error calling to get cat fact', e);
+		await slackRespond({
+			responseURL: req.body.response_url,
+			text: `Failed to retrieve cat fact from cat-fact.herokuapp.com. Perhaps the app is down?`,
+			respondInChannel: false
+		});
+		return res.status(200).end();
+	}
+	const factText = catFactResponse.data.text;
+	await slackRespond({
+		responseURL: req.body.response_url,
+		text: `<@${req.body.user_id}>'s cat fact:\n${factText}`,
+		respondInChannel: true
 	});
-	const factText = response.data.text;
-	return respond(payload, h, `<@${payload.user_id}>'s cat fact:\n${factText}`, true);
+	return res.status(200).end();
 }
 
-module.exports = catfact;
+module.exports = catFact;
