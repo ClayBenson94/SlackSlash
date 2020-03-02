@@ -1,0 +1,13 @@
+language: node_js
+branches:
+  only:
+    - master
+  except:
+    - '*'
+install:
+  - npm install -g firebase-tools
+script:
+  - npm ci
+after_success:
+  - firebase use default
+  - firebase deploy --token $FIREBASE_TOKEN
