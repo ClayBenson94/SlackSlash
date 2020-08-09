@@ -18,6 +18,6 @@ const app = new App({
 app.error(console.log);
 
 /* Add functionality here */
-app.command('/catfact', require('./commands/catfact');
+app.command('/catfact', require('./commands/catfact'));
 
 exports.slackslash = functions.https.onRequest(expressReceiver.app);
