@@ -1,23 +1,24 @@
-const { App } = require('@slack/bolt');
+const { App, ExpressReceiver } = require('@slack/bolt');
 const functions = require('firebase-functions');
 
-const app = new App({
+const expressReceiver = new ExpressReceiver({
 	signingSecret: functions.config().slackslash.slack_signing_secret,
-	token: functions.config().slackslash.slack_verification_token,
+	endpoints: '/events',
+})
+
+const app = new App({
+	receiver: expressReceiver,
+	token: functions.config().slackslash.slack_bot_token,
 });
+
+// Global error handler
+app.error(console.log);
 
 /* Add functionality here */
-
-(async () => {
-  // Start the app
-  await app.start(process.env.PORT || 3000);
-
-  console.log('⚡️ Bolt app is running!');
-})();
-
-app.command('cat-fact', async ({say, respond, ack}) => {
+app.command('/catfact', async ({command, ack, respond}) => {
+	console.log('WE IN THE CAT FACT');
 	await ack();
-	await respond('Testing a cat fact. This is not a real cat fact.');
+	await respond(`You said "${command.text}"`);
 });
 
-exports.slackslash = functions.https.onRequest(app);
+exports.slackslash = functions.https.onRequest(expressReceiver.app);
