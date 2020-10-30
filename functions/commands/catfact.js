@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const catFact = async ({command, ack, respond, say}) => {
+const catFact = async ({command, ack, respond}) => {
 	ack();
 
 	try {
@@ -10,7 +10,10 @@ const catFact = async ({command, ack, respond, say}) => {
 		});
 
 		const factText = catFactResponse.data.text;
-		await say(`<@${command.user_id}>'s cat fact:\n${factText}`)
+		await respond({
+			response_type: 'in_channel',
+			text: `<@${command.user_id}>'s cat fact:\n${factText}`
+		})
 	} catch (e) {
 		console.error('Error to getting cat fact', e);
 		await respond({
