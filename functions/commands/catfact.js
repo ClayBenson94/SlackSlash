@@ -1,7 +1,7 @@
 const axios = require('axios');
 
-const catFact = async ({command, ack, respond}) => {
-	await ack();
+const catFact = async ({command, ack, respond, say}) => {
+	ack();
 
 	try {
 		const catFactResponse = await axios({
@@ -10,7 +10,7 @@ const catFact = async ({command, ack, respond}) => {
 		});
 
 		const factText = catFactResponse.data.text;
-		await respond(`<@${command.user_id}>'s cat fact:\n${factText}`)
+		await say(`<@${command.user_id}>'s cat fact:\n${factText}`)
 	} catch (e) {
 		console.error('Error to getting cat fact', e);
 		await respond({
