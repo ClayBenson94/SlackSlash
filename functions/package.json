@@ -12,9 +12,9 @@
     "node": "12"
   },
   "dependencies": {
-    "@slack/bolt": "^2.2.3",
-    "axios": "^0.19.2",
-    "firebase-admin": "^8.6.0",
+    "@slack/bolt": "^3.3.0",
+    "axios": "^0.21.1",
+    "firebase-admin": "^9.6.0",
     "firebase-functions": "^3.3.0"
   },
   "devDependencies": {

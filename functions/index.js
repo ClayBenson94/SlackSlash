@@ -6,7 +6,7 @@ const axios = require('axios');
 const expressReceiver = new ExpressReceiver({
 	signingSecret: functions.config().slackslash.slack_signing_secret,
 	endpoints: '/events',
-})
+});
 
 // Set up BoltJS app
 const app = new App({
